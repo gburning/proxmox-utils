@@ -8,7 +8,7 @@ textNormal=$(tput sgr0)
 
 _lastLXCId=$(pct list | tail -n 1 | grep -Eo '^[[:digit:]]+' -)
 
-LXC_ID=$((LAST_LXC_ID + 1))
+LXC_ID=$((_lastLXCId + 1))
 LXC_TEMPLATE="local:vztmpl/debian-13-standard_13.1-2_amd64.tar.zst"
 LXC_HOST_MNT="/mnt/shared"
 LXC_GUEST_MNT="/mnt/shared"
