@@ -57,7 +57,7 @@ EOF
 LXC_HOSTNAME=$1
 
 if [[ -z "$LXC_HOSTNAME" ]]; then
-    printf "HOSTNAME is required\n"
+    printf "${textBold}HOSTNAME is required${textNormal}\n\n"
     usage
     exit 1
 fi
