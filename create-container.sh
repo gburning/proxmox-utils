@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+textRed=$(tput setaf 1)
 textBold=$(tput bold)
 textNormal=$(tput sgr0)
 
@@ -17,7 +18,7 @@ LXC_MEMORY_MB=2048
 
 usage() {
     cat <<EOF
-${textBold}SYNOPSIS${textNormal}
+${textBold}USAGE${textNormal}
     $0 <HOSTNAME> [OPTIONS]
 
 ${textBold}DESCRIPTION${textNormal}
@@ -57,8 +58,8 @@ EOF
 LXC_HOSTNAME=$1
 
 if [[ -z "$LXC_HOSTNAME" ]]; then
-    printf "${textBold}HOSTNAME is required${textNormal}\n\n"
-    usage
+    printf "${textRed}${textBold}ERROR: Please provide a hostname.${textNormal}\n\n"
+    echo "See --help for more info."
     exit 1
 fi
 
@@ -71,7 +72,8 @@ while [ ! $# -eq 0 ]; do
             LXC_ID="$2"
             shift
         else
-            echo '--id requires a value'
+            printf "${textRed}ERROR: --id requires a value${textNormal}\n\n"
+            echo "See --help for more info."
             exit 1
         fi
         ;;
@@ -80,7 +82,8 @@ while [ ! $# -eq 0 ]; do
             LXC_TEMPLATE="$2"
             shift
         else
-            echo '--template requires a value'
+            printf "${textRed}ERROR: --template requires a value${textNormal}\n\n"
+            echo "See --help for more info."
             exit 1
         fi
         ;;
@@ -89,7 +92,8 @@ while [ ! $# -eq 0 ]; do
             LXC_HOST_MNT="$2"
             shift
         else
-            echo '--host-mount requires a value'
+            printf "${textRed}ERROR: --host-mount requires a value${textNormal}\n\n"
+            echo "See --help for more info."
             exit 1
         fi
         ;;
@@ -98,7 +102,8 @@ while [ ! $# -eq 0 ]; do
             LXC_GUEST_MNT="$2"
             shift
         else
-            echo '--guest-mount requires a value'
+            printf "${textRed}ERROR: --guest-mount requires a value${textNormal}\n\n"
+            echo "See --help for more info."
             exit 1
         fi
         ;;
@@ -107,7 +112,8 @@ while [ ! $# -eq 0 ]; do
             LXC_VOLSIZE_GB="$2"
             shift
         else
-            echo '--disk-size requires a value'
+            printf "${textRed}ERROR: --disk-size requires a value${textNormal}\n\n"
+            echo "See --help for more info."
             exit 1
         fi
         ;;
@@ -116,7 +122,8 @@ while [ ! $# -eq 0 ]; do
             LXC_CPU_CORES="$2"
             shift
         else
-            echo '--cpu-cores requires a value'
+            printf "${textRed}ERROR: --cpu-cores requires a value${textNormal}\n\n"
+            echo "See --help for more info."
             exit 1
         fi
         ;;
@@ -125,7 +132,8 @@ while [ ! $# -eq 0 ]; do
             LXC_MEMORY_MB="$2"
             shift
         else
-            echo '--memory-limit requires a value'
+            printf "${textRed}ERROR: --memory-limit requires a value${textNormal}\n\n"
+            echo "See --help for more info."
             exit 1
         fi
         ;;
