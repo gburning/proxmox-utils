@@ -4,6 +4,29 @@ textRed=$(tput setaf 1)
 textBold=$(tput bold)
 textNormal=$(tput sgr0)
 
+confirm_action() {
+    while true; do
+        read -r -n1 -p "Do you want to proceed? [y,n] " response
+
+        printf "\n"
+
+        case "$response" in
+        y | Y)
+            true
+            return
+            ;;
+        n | N)
+            false
+            return 1
+            ;;
+        *)
+            printf "${textRed}Please provide a valid answer\n${textNormal}"
+            continue
+            ;;
+        esac
+    done
+}
+
 # 1. Set defaults for optional arguments
 
 _lastLXCId=$(pct list | tail -n 1 | grep -Eo '^[[:digit:]]+' -)
@@ -151,6 +174,31 @@ done
 
 # 3. Create container with provided hostname and optionally provided options
 
+echo "
+Container will be created with these parameters:
+
+    HOSTNAME:   $LXC_HOSTNAME
+    ID:         $LXC_ID
+    TEMPLATE:   $LXC_TEMPLATE
+    HOST_MNT:   $LXC_HOST_MNT
+    GUEST_MNT:  $LXC_GUEST_MNT
+    VOLSIZE_GB: $LXC_VOLSIZE_GB
+    CPU_CORES:  $LXC_CPU_CORES
+    MEMORY_MB:  $LXC_MEMORY_MB
+"
+
+if ! confirm_action; then
+    echo "User chose not to proceed. Exiting..."
+    exit 0
+fi
+
+# Echo commands during execution (except those whitelisted)
+# See: https://unix.stackexchange.com/a/725182
+set -T
+trap '! [[ "$BASH_COMMAND" =~ ^(echo|printf) ]] &&
+      printf "+ %s\n" "$BASH_COMMAND"' DEBUG
+
+printf "\nCreating new container…\n"
 pct create "$LXC_ID" "$LXC_TEMPLATE" \
     --hostname "$LXC_HOSTNAME" \
     --cores "$LXC_CPU_CORES" \
@@ -166,12 +214,16 @@ pct create "$LXC_ID" "$LXC_TEMPLATE" \
     --password "" # Prompts user for password
 
 # 4. Add nas_share user
+
+printf "\nAdding nas_share user '%s'…\n" "$LXC_HOSTNAME"
 pct exec "$LXC_ID" -- groupadd -g 10000 nas_shares
 pct exec "$LXC_ID" -- useradd "$LXC_HOSTNAME" -u 1000 -g 10000 -m -s /bin/bash
 
 # 5. Install avahi-daemon
+printf "\nInstalling avahi-daemon…\n"
 pct exec "$LXC_ID" apt install avahi-daemon
 
 # 6. Set OS locale in container (optional)
+printf "\nConfiguring OS locales…\n"
 pct enter "$LXC_ID"
 dpkg-reconfigure locales
