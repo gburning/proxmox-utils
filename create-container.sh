@@ -2,9 +2,9 @@
 
 set -o errexit
 
-textRed=$(tput setaf 1)
-textBold=$(tput bold)
-textItalics=$(tput sitm)
+textRed=$(tput setaf 1 || echo '')
+textBold=$(tput bold || echo '')
+textItalics=$(tput sitm || echo '')
 textNormal=$(tput sgr0)
 
 log_info() {
