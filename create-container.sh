@@ -221,17 +221,7 @@ pct create "$LXC_ID" "$LXC_TEMPLATE" \
     --features nesting=1 \
     --password "" # Prompts user for password
 
-# 4. Add nas_share user
-
-log_info "Adding nas_share user '$LXC_HOSTNAME'…"
-pct exec "$LXC_ID" -- groupadd -g 10000 nas_shares
-pct exec "$LXC_ID" -- useradd "$LXC_HOSTNAME" -u 1000 -g 10000 -m -s /bin/bash
-
-# 5. Install avahi-daemon
-log_info 'Installing avahi-daemon…'
-pct exec "$LXC_ID" apt install avahi-daemon
-
-# 6. Set OS locale in container (optional)
+# 4. Set OS locale in container (optional)
 log_info 'Configuring OS locales…'
 pct exec "$LXC_ID" -- bash -c "\
     set -x && \
@@ -239,3 +229,13 @@ pct exec "$LXC_ID" -- bash -c "\
     dpkg-reconfigure --frontend=noninteractive locales && \
     update-locale LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8 \
 "
+
+# 5. Add nas_share user
+
+log_info "Adding nas_share user '$LXC_HOSTNAME'…"
+pct exec "$LXC_ID" -- groupadd -g 10000 nas_shares
+pct exec "$LXC_ID" -- useradd "$LXC_HOSTNAME" -u 1000 -g 10000 -m -s /bin/bash
+
+# 6. Install avahi-daemon
+log_info 'Installing avahi-daemon…'
+pct exec "$LXC_ID" apt install avahi-daemon
