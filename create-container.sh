@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -o errexit
+
 textRed=$(tput setaf 1)
 textBold=$(tput bold)
 textNormal=$(tput sgr0)
