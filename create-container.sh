@@ -4,7 +4,7 @@ set -o errexit
 
 textRed=$(tput setaf 1 || echo '')
 textBold=$(tput bold || echo '')
-textItalics=$(tput sitm || echo '')
+textEmphasis=$(tput sitm || tput smul || echo '')
 textNormal=$(tput sgr0)
 
 log_info() {
@@ -185,14 +185,14 @@ done
 
 log_info "
 Container will be created with these parameters:${textNormal}
-    HOSTNAME:   ${textItalics}$LXC_HOSTNAME${textNormal}
-    ID:         ${textItalics}$LXC_ID${textNormal}
-    TEMPLATE:   ${textItalics}$LXC_TEMPLATE${textNormal}
-    HOST_MNT:   ${textItalics}$LXC_HOST_MNT${textNormal}
-    GUEST_MNT:  ${textItalics}$LXC_GUEST_MNT${textNormal}
-    VOLSIZE_GB: ${textItalics}$LXC_VOLSIZE_GB${textNormal}
-    CPU_CORES:  ${textItalics}$LXC_CPU_CORES${textNormal}
-    MEMORY_MB:  ${textItalics}$LXC_MEMORY_MB${textNormal}
+    HOSTNAME:   ${textEmphasis}$LXC_HOSTNAME${textNormal}
+    ID:         ${textEmphasis}$LXC_ID${textNormal}
+    TEMPLATE:   ${textEmphasis}$LXC_TEMPLATE${textNormal}
+    HOST_MNT:   ${textEmphasis}$LXC_HOST_MNT${textNormal}
+    GUEST_MNT:  ${textEmphasis}$LXC_GUEST_MNT${textNormal}
+    VOLSIZE_GB: ${textEmphasis}$LXC_VOLSIZE_GB${textNormal}
+    CPU_CORES:  ${textEmphasis}$LXC_CPU_CORES${textNormal}
+    MEMORY_MB:  ${textEmphasis}$LXC_MEMORY_MB${textNormal}
 "
 
 if ! confirm_action; then
