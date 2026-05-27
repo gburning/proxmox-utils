@@ -204,7 +204,7 @@ fi
 # See: https://unix.stackexchange.com/a/725182
 set -T
 trap '! [[ "$BASH_COMMAND" =~ ^(echo|printf|log_) ]] &&
-      printf "+ %s\n" "$BASH_COMMAND"' DEBUG
+    printf "+ %s\n" "$BASH_COMMAND"' DEBUG
 
 log_info 'Creating new container…'
 pct create "$LXC_ID" "$LXC_TEMPLATE" \
