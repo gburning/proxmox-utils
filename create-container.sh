@@ -4,13 +4,20 @@ set -o errexit
 
 textRed=$(tput setaf 1)
 textBold=$(tput bold)
+textItalics=$(tput sitm)
 textNormal=$(tput sgr0)
+
+log_info() {
+    printf '\n%s%s%s\n' "$textBold" "$1" "$textNormal"
+}
+
+log_error() {
+    log_info "$textRed$1"
+}
 
 confirm_action() {
     while true; do
-        read -r -n1 -p "Do you want to proceed? [y,n] " response
-
-        printf "\n"
+        read -r -n1 -p "${textBold}Do you want to proceed? [y,n]${textNormal} " response
 
         case "$response" in
         y | Y)
@@ -22,7 +29,7 @@ confirm_action() {
             return 1
             ;;
         *)
-            printf "${textRed}Please provide a valid answer\n${textNormal}"
+            log_error 'Please provide a valid answer'
             continue
             ;;
         esac
@@ -83,8 +90,8 @@ EOF
 LXC_HOSTNAME=$1
 
 if [[ -z "$LXC_HOSTNAME" ]]; then
-    printf "${textRed}${textBold}ERROR: Please provide a hostname.${textNormal}\n\n"
-    echo "See --help for more info."
+    log_error 'ERROR: Please provide a hostname.'
+    log_info 'See --help for more info.'
     exit 1
 fi
 
@@ -97,8 +104,8 @@ while [ ! $# -eq 0 ]; do
             LXC_ID="$2"
             shift
         else
-            printf "${textRed}ERROR: --id requires a value${textNormal}\n\n"
-            echo "See --help for more info."
+            log_error 'ERROR: --id requires a value'
+            log_info 'See --help for more info.'
             exit 1
         fi
         ;;
@@ -107,8 +114,8 @@ while [ ! $# -eq 0 ]; do
             LXC_TEMPLATE="$2"
             shift
         else
-            printf "${textRed}ERROR: --template requires a value${textNormal}\n\n"
-            echo "See --help for more info."
+            log_error 'ERROR: --template requires a value'
+            log_info 'See --help for more info.'
             exit 1
         fi
         ;;
@@ -117,8 +124,8 @@ while [ ! $# -eq 0 ]; do
             LXC_HOST_MNT="$2"
             shift
         else
-            printf "${textRed}ERROR: --host-mount requires a value${textNormal}\n\n"
-            echo "See --help for more info."
+            log_error 'ERROR: --host-mount requires a value'
+            log_info 'See --help for more info.'
             exit 1
         fi
         ;;
@@ -127,8 +134,8 @@ while [ ! $# -eq 0 ]; do
             LXC_GUEST_MNT="$2"
             shift
         else
-            printf "${textRed}ERROR: --guest-mount requires a value${textNormal}\n\n"
-            echo "See --help for more info."
+            log_error 'ERROR: --guest-mount requires a value'
+            log_info 'See --help for more info.'
             exit 1
         fi
         ;;
@@ -137,8 +144,8 @@ while [ ! $# -eq 0 ]; do
             LXC_VOLSIZE_GB="$2"
             shift
         else
-            printf "${textRed}ERROR: --disk-size requires a value${textNormal}\n\n"
-            echo "See --help for more info."
+            log_error 'ERROR: --disk-size requires a value'
+            log_info 'See --help for more info.'
             exit 1
         fi
         ;;
@@ -147,8 +154,8 @@ while [ ! $# -eq 0 ]; do
             LXC_CPU_CORES="$2"
             shift
         else
-            printf "${textRed}ERROR: --cpu-cores requires a value${textNormal}\n\n"
-            echo "See --help for more info."
+            log_error 'ERROR: --cpu-cores requires a value'
+            log_info 'See --help for more info.'
             exit 1
         fi
         ;;
@@ -157,8 +164,8 @@ while [ ! $# -eq 0 ]; do
             LXC_MEMORY_MB="$2"
             shift
         else
-            printf "${textRed}ERROR: --memory-limit requires a value${textNormal}\n\n"
-            echo "See --help for more info."
+            log_error 'ERROR: --memory-limit requires a value'
+            log_info 'See --help for more info.'
             exit 1
         fi
         ;;
@@ -176,31 +183,30 @@ done
 
 # 3. Create container with provided hostname and optionally provided options
 
-echo "
-Container will be created with these parameters:
-
-    HOSTNAME:   $LXC_HOSTNAME
-    ID:         $LXC_ID
-    TEMPLATE:   $LXC_TEMPLATE
-    HOST_MNT:   $LXC_HOST_MNT
-    GUEST_MNT:  $LXC_GUEST_MNT
-    VOLSIZE_GB: $LXC_VOLSIZE_GB
-    CPU_CORES:  $LXC_CPU_CORES
-    MEMORY_MB:  $LXC_MEMORY_MB
+log_info "
+Container will be created with these parameters:${textNormal}
+    HOSTNAME:   ${textItalics}$LXC_HOSTNAME${textNormal}
+    ID:         ${textItalics}$LXC_ID${textNormal}
+    TEMPLATE:   ${textItalics}$LXC_TEMPLATE${textNormal}
+    HOST_MNT:   ${textItalics}$LXC_HOST_MNT${textNormal}
+    GUEST_MNT:  ${textItalics}$LXC_GUEST_MNT${textNormal}
+    VOLSIZE_GB: ${textItalics}$LXC_VOLSIZE_GB${textNormal}
+    CPU_CORES:  ${textItalics}$LXC_CPU_CORES${textNormal}
+    MEMORY_MB:  ${textItalics}$LXC_MEMORY_MB${textNormal}
 "
 
 if ! confirm_action; then
-    echo "User chose not to proceed. Exiting..."
+    log_info 'User chose not to proceed. Exiting...'
     exit 0
 fi
 
 # Echo commands during execution (except those whitelisted)
 # See: https://unix.stackexchange.com/a/725182
 set -T
-trap '! [[ "$BASH_COMMAND" =~ ^(echo|printf) ]] &&
+trap '! [[ "$BASH_COMMAND" =~ ^(echo|printf|log_) ]] &&
       printf "+ %s\n" "$BASH_COMMAND"' DEBUG
 
-printf "\nCreating new container…\n"
+log_info 'Creating new container…'
 pct create "$LXC_ID" "$LXC_TEMPLATE" \
     --hostname "$LXC_HOSTNAME" \
     --cores "$LXC_CPU_CORES" \
@@ -217,16 +223,16 @@ pct create "$LXC_ID" "$LXC_TEMPLATE" \
 
 # 4. Add nas_share user
 
-printf "\nAdding nas_share user '%s'…\n" "$LXC_HOSTNAME"
+log_info "Adding nas_share user '$LXC_HOSTNAME'…"
 pct exec "$LXC_ID" -- groupadd -g 10000 nas_shares
 pct exec "$LXC_ID" -- useradd "$LXC_HOSTNAME" -u 1000 -g 10000 -m -s /bin/bash
 
 # 5. Install avahi-daemon
-printf "\nInstalling avahi-daemon…\n"
+log_info 'Installing avahi-daemon…'
 pct exec "$LXC_ID" apt install avahi-daemon
 
 # 6. Set OS locale in container (optional)
-printf "\nConfiguring OS locales…\n"
+log_info 'Configuring OS locales…'
 pct exec "$LXC_ID" -- \
     sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen &&
     dpkg-reconfigure --frontend=noninteractive locales &&
