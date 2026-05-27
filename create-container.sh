@@ -227,5 +227,4 @@ pct exec "$LXC_ID" apt install avahi-daemon
 
 # 6. Set OS locale in container (optional)
 printf "\nConfiguring OS locales…\n"
-pct enter "$LXC_ID"
-dpkg-reconfigure locales
+pct exec "$LXC_ID" -- dpkg-reconfigure locales
