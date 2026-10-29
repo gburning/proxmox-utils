@@ -174,8 +174,9 @@ while [ ! $# -eq 0 ]; do
         exit
         ;;
     *)
+        log_error "ERROR: Invalid argument '$1'"
         usage
-        exit
+        exit 1
         ;;
     esac
     shift
